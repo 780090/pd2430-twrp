@@ -26,6 +26,8 @@ cd "$HOME/twrp"
 repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14
 repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
+# minimal manifest 缺 external/guava（framework 注解处理器要用）
+git clone --depth=1 -q https://github.com/LineageOS/android_external_guava.git external/guava -b lineage-21.0
 df -h /
 
 echo "== 加 12G swap（kati 解析 14.0 全量配置内存会爆，VM 被收割）"
