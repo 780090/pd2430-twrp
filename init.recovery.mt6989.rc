@@ -1,10 +1,10 @@
 # PD2430 (vivo S20 Pro / mt6989) recovery init
-# USB / vold 部分参考真机 mt6989 树（realme RE6022L1）
+# 结构对齐 remb(K60E)/PD2309(X100) 可用树；USB gadget 交给 init.recovery.usb.rc
 
 on init
-    setprop sys.usb.configfs 1
     setprop sys.usb.controller "11201000.usb0"
     setprop sys.usb.ffs.aio_compat 1
+    # init 只自动加载 modules.load，这里补 modules.load.recovery（stock 的 recovery 清单）
     exec -- /system/bin/sh /system/bin/loadmods.sh
 
 on fs
@@ -16,7 +16,15 @@ on early-fs
 on late-fs
     mount_all /first_stage_ramdisk/fstab.mt6989 --late
 
+on post-fs
+    # A/B boot region（UFS）——remb 同款，fastbootd 换槽要靠这些节点
+    wait /dev/block/mmcblk0boot0 2
+    symlink /dev/block/sda /dev/block/mmcblk0boot0
+    symlink /dev/block/sdb /dev/block/mmcblk0boot1
+    symlink /dev/block/platform/bootdevice /dev/block/bootdevice
+
 on boot
     start health-hal-2-1
 
+import /init.recovery.usb.rc
 import /init.recovery.touch.rc
