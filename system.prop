@@ -1,5 +1,10 @@
+ro.mediatek.platform=MT6989
+ro.vendor.mediatek.platform=MT6989
+ro.hardware=mt6989
 ro.product.device=PD2430
 ro.product.model=vivo S20 Pro
 ro.board.platform=mt6989
-ro.hardware=mt6989
 ro.twrp.target.devices=PD2430
+ro.boot.dynamic_partitions=true
+fbe.metadata.wrappedkey=true
+ro.postinstall.fstab.prefix=/system
