@@ -6,9 +6,8 @@ echo "== 腾磁盘"
 sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}" || true
 df -h /
 
-echo "== 加 swap（防空 OOM）"
-sudo fallocate -l 8G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=8192
-sudo chmod 600 /swapfile && sudo mkswap /swapfile >/dev/null && sudo swapon /swapfile && free -h
+echo "== 看内存/swap"
+free -h; sudo swapon --show || true
 
 echo "== 装依赖"
 sudo apt-get update -qq
