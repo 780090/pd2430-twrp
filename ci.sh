@@ -26,8 +26,9 @@ cd "$HOME/twrp"
 repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14
 repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
-# minimal manifest 缺 external/guava（framework 注解处理器要用）
-git clone --depth=1 -q https://github.com/LineageOS/android_external_guava.git external/guava -b lineage-21.0
+# minimal manifest 缺 prebuilts/misc（guava 等 framework 工具预编译在里头）
+git clone --depth=1 -q https://android.googlesource.com/platform/prebuilts/misc prebuilts/misc \
+  -b android-14.0.0_r1 || echo "prebuilts/misc clone 失败，继续"
 df -h /
 
 echo "== 加 12G swap（kati 解析 14.0 全量配置内存会爆，VM 被收割）"
@@ -67,6 +68,7 @@ echo "== 编译"
 cd "$HOME/twrp"
 set +u
 export ALLOW_MISSING_DEPENDENCIES=true
+export SOONG_ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
 lunch twrp_PD2430-ap2a-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
