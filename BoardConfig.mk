@@ -46,6 +46,8 @@ VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 # 内核：stock prebuilt（GKI 通用内核镜像）
 TARGET_FORCE_PREBUILT_KERNEL := true
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image
+# dtb.img = stock vendor_boot 的 dtb 段（DTBO 组合镜像 magic d7b7ab1e，451179 B）
+# 注意不是 boot 里那个 DTB（d00dfeed），LK 引导 recovery 读的是 vendor_boot 的这段
 TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
 BOARD_KERNEL_IMAGE_NAME := Image
 BOARD_BOOT_HEADER_VERSION := 4
@@ -137,6 +139,8 @@ TW_STATUS_ICONS_ALIGN := center
 TW_SUPPORT_INPUT_AIDL_HAPTICS := true
 TW_NO_FASTBOOT_BOOT := true
 TW_INCLUDE_FASTBOOTD := true
+# 自带 init.recovery.usb.rc（configfs 全套 gadget），排除 TWRP 默认 USB init
+TW_EXCLUDE_DEFAULT_USB_INIT := true
 
 # 解密：X100 那棵树是开着的，S20 Pro 先照搬试
 TW_INCLUDE_CRYPTO := false
