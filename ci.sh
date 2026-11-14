@@ -16,7 +16,7 @@ sudo apt-get install -y -qq git-core gnupg flex bison build-essential zip curl \
   zlib1g-dev libc6-dev-i386 lib32ncurses-dev libx11-dev lib32z1-dev \
   libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3
 
-echo "== 同步 TWRP 14.0 源码"
+echo "== 同步 TWRP 源码 (twrp-12.1)"
 mkdir -p "$HOME/bin" "$HOME/twrp"
 curl -s https://storage.googleapis.com/git-repo-downloads/repo > "$HOME/bin/repo"
 chmod a+x "$HOME/bin/repo"
@@ -55,7 +55,8 @@ make vendorbootimage -j2
 
 echo "== 回传产物到仓库"
 ls -l out/target/product/PD2430/ || true
-IMG=$(ls out/target/product/PD2430/*.img 2>/dev/null | head -1)
+IMG=out/target/product/PD2430/vendor_boot.img
+[ -f "$IMG" ] || IMG=$(ls out/target/product/PD2430/*.img 2>/dev/null | head -1)
 if [ -n "$IMG" ]; then
   mkdir -p "$GITHUB_WORKSPACE/out"
   gzip -9 -c "$IMG" > "$GITHUB_WORKSPACE/out/$(basename "$IMG").gz"
