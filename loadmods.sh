@@ -1,6 +1,6 @@
 #!/system/bin/sh
 # 加载 stock vendor_boot 里的 recovery 内核模块。
-# 优先 insmod -f（内核可能带强制加载），失败再普通 insmod，最后试 modprobe。
+# 顺序：insmod -f → insmod → modprobe -f，全部失败只记日志不中断。
 LOG=/tmp/loadmods.log
 [ -f /lib/modules/modules.load.recovery ] || exit 0
 : > $LOG
