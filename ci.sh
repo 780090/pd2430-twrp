@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PD2430 TWRP 构建脚本（由 .github/workflows/build.yml 一行 JSON 调用）
-set -euo pipefail
+set -eo pipefail
 
 echo "== 腾磁盘"
 sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}" || true
@@ -41,6 +41,7 @@ find "$D" -type f | sort
 
 echo "== 编译"
 cd "$HOME/twrp"
+set +u
 export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
