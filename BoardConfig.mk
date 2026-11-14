@@ -12,8 +12,6 @@ AB_OTA_PARTITIONS += \
     system vendor product odm odm_dlkm system_dlkm vendor_dlkm \
     boot vbmeta_vendor lk vendor_boot
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
-BOARD_USES_VENDOR_BOOT := true
-BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 TARGET_NO_RECOVERY := true
 
 # 架构
@@ -31,7 +29,6 @@ TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a55
 # 板级
 TARGET_BOOTLOADER_BOARD_NAME := k6989v1_64
 TARGET_NO_BOOTLOADER := true
-TARGET_USES_UEFI := true
 BOARD_USES_MTK_HARDWARE := true
 TARGET_BOARD_PLATFORM := mt6989
 
