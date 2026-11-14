@@ -40,13 +40,13 @@ ls -l "$D/prebuilt/Image"
 cp "$GITHUB_WORKSPACE/dtb.img" "$D/prebuilt/dtb.img"
 cp "$GITHUB_WORKSPACE/recovery.fstab" "$D/recovery/root/system/etc/recovery.fstab"
 cp "$GITHUB_WORKSPACE/fstab.mt6989" "$D/recovery/root/first_stage_ramdisk/fstab.mt6989"
-# stock vendor_boot 里的内核模块 + init.recovery.mt6989.rc（显示/触摸/UFS 全靠它们）
+# stock vendor_boot 里的内核模块 + init.recovery.*.rc（显示/触摸/UFS 全靠它们）
 tar xzf "$GITHUB_WORKSPACE/vendor-rec.tar.gz" -C "$D/recovery/root"
 cp "$GITHUB_WORKSPACE/loadmods.sh" "$D/recovery/root/system/bin/loadmods.sh"
 chmod 0755 "$D/recovery/root/system/bin/loadmods.sh"
 cp "$GITHUB_WORKSPACE/init.recovery.mt6989.rc" "$D/recovery/root/"
+cp "$GITHUB_WORKSPACE/init.recovery.usb.rc" "$D/recovery/root/"
 ls "$D/recovery/root/lib/modules" | wc -l
-find "$D" -type f | sort
 
 echo "== 编译"
 cd "$HOME/twrp"
@@ -55,26 +55,23 @@ export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
 lunch twrp_PD2430-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
-# twrp-12.1 只编 vendorboot 时不会生成 $(PRODUCT_OUT)/root，打包 recovery ramdisk 会失败。
-# 先编 bootimage 把 root 填起来（产物用不上），再兜底建目录。
-make bootimage -j2 || true
-mkdir -p out/target/product/PD2430/root
-ls -ld out/target/product/PD2430/root
+# remb(K60E) 同款：直接 vendorbootimage。recovery/root 会被构建系统自动合并进
+# vendor_boot（build/core/Makefile 的 recovery_root_private 机制）。
 make vendorbootimage -j2
 
+echo "== 检查产物"
+ls -l out/target/product/PD2430/vendor_boot.img
+du -sh out/target/product/PD2430/recovery/root out/target/product/PD2430/root out/target/product/PD2430/vendor_ramdisk 2>/dev/null || true
+echo "--- recovery/root/system/bin 前 20 个文件 ---"
+ls out/target/product/PD2430/recovery/root/system/bin/ 2>/dev/null | head -20 || true
+echo "--- recovery/root 顶层 ---"
+ls out/target/product/PD2430/recovery/root/ 2>/dev/null || true
+
 echo "== 回传产物到仓库"
-ls -l out/target/product/PD2430/ || true
 IMG=out/target/product/PD2430/vendor_boot.img
-[ -f "$IMG" ] || IMG=$(ls out/target/product/PD2430/*.img 2>/dev/null | head -1)
-if [ -n "$IMG" ]; then
-  mkdir -p "$GITHUB_WORKSPACE/out"
-  gzip -9 -c "$IMG" > "$GITHUB_WORKSPACE/out/$(basename "$IMG").gz"
-  cd "$GITHUB_WORKSPACE"
-  git config user.name  "ci-bot"
-  git config user.email "ci-bot@users.noreply.github.com"
-  git add out/
-  git commit -m "build: $(date -u +%Y%m%d-%H%M) $(basename "$IMG")" || true
-  git push
-else
-  echo "没有找到 .img 产物，看看上面的编译日志"; exit 1
-fi
+mkdir -p "$GITHUB_WORKSPACE/out"
+gzip -9 -c "$IMG" > "$GITHUB_WORKSPACE/out/vendor_boot.img.gz"
+cd "$GITHUB_WORKSPACE"
+git add out/
+git commit -m "build: $(date -u +%Y%m%d-%H%M) vendor_boot.img" || true
+git push
