@@ -45,7 +45,7 @@ set +u
 export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
-lunch twrp_PD2430-eng
+lunch twrp_PD2430-ap2a-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
 mka vendorbootimage -j"$(nproc --all)"
 
 echo "== 回传产物到仓库"
