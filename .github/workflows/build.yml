@@ -1,1 +1,1 @@
-{"name":"build","on":["workflow_dispatch","push"],"jobs":{"build":{"runs-on":"ubuntu-22.04","timeout-minutes":350,"steps":[{"uses":"actions/checkout@v4"},{"run":"bash ci.sh"}]}}}
+{"name":"build","on":["workflow_dispatch"],"permissions":{"contents":"write","actions":"write"},"concurrency":{"group":"pd2430","cancel-in-progress":true},"jobs":{"build":{"runs-on":"ubuntu-22.04","timeout-minutes":350,"steps":[{"uses":"actions/checkout@v4"},{"run":"bash ci.sh"}]}}}
