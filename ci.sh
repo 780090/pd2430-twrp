@@ -3,22 +3,25 @@
 set -euo pipefail
 
 echo "== 腾磁盘"
-sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}" || true
 df -h /
 
 echo "== 装依赖"
 sudo apt-get update -qq
+# 22.04 上没有 libncurses5/lib32ncurses5-dev，用 lib32ncurses-dev 代替
 sudo apt-get install -y -qq git-core gnupg flex bison build-essential zip curl \
-  zlib1g-dev libc6-dev-i386 libncurses5 lib32ncurses5-dev x11proto-core-dev \
-  libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3
+  zlib1g-dev libc6-dev-i386 lib32ncurses-dev libx11-dev lib32z1-dev \
+  libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3
 
 echo "== 同步 TWRP 14.0 源码"
 mkdir -p "$HOME/bin" "$HOME/twrp"
 curl -s https://storage.googleapis.com/git-repo-downloads/repo > "$HOME/bin/repo"
 chmod a+x "$HOME/bin/repo"
 export PATH="$HOME/bin:$PATH"
+git config --global user.name  "ci-bot"
+git config --global user.email "ci-bot@users.noreply.github.com"
 cd "$HOME/twrp"
-repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14.0
+repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14
 repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
 df -h /
