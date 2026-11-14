@@ -26,9 +26,16 @@ cd "$HOME/twrp"
 repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14
 repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
-# minimal manifest 缺 prebuilts/misc（guava 等 framework 工具预编译在里头）
-git clone --depth=1 -q https://android.googlesource.com/platform/prebuilts/misc prebuilts/misc \
-  -b android-14.0.0_r1 || echo "prebuilts/misc clone 失败，继续"
+# manifest 里有 prebuilts/misc 但缺 guava 模块：从 AOSP 拉 guava 子树补进去
+if [ -d prebuilts/misc/.git ]; then
+  git -C prebuilts/misc fetch --depth=1 -q https://android.googlesource.com/platform/prebuilts/misc \
+    refs/tags/android-14.0.0_r1 2>/dev/null || true
+  git -C prebuilts/misc checkout -q FETCH_HEAD -- common/guava 2>/dev/null || true
+else
+  git clone --depth=1 -q https://android.googlesource.com/platform/prebuilts/misc prebuilts/misc \
+    -b android-14.0.0_r1 || true
+fi
+ls prebuilts/misc/common/guava/ 2>/dev/null || echo "guava 目录仍缺"
 df -h /
 
 echo "== 加 12G swap（kati 解析 14.0 全量配置内存会爆，VM 被收割）"
