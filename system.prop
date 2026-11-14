@@ -1,0 +1,5 @@
+ro.product.device=PD2430
+ro.product.model=vivo S20 Pro
+ro.board.platform=mt6989
+ro.hardware=mt6989
+ro.twrp.target.devices=PD2430
