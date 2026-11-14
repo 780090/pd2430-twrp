@@ -32,8 +32,6 @@ mkdir -p "$D/prebuilt" "$D/recovery/root/system/etc" "$D/recovery/root/first_sta
 cp "$GITHUB_WORKSPACE/BoardConfig.mk" "$GITHUB_WORKSPACE/device.mk" \
    "$GITHUB_WORKSPACE/AndroidProducts.mk" "$GITHUB_WORKSPACE/twrp_PD2430.mk" \
    "$GITHUB_WORKSPACE/system.prop" "$D/"
-gunzip -c "$GITHUB_WORKSPACE/Image.gz" > "$D/prebuilt/Image"
-ls -l "$D/prebuilt/Image"
 cp "$GITHUB_WORKSPACE/dtb.img" "$D/prebuilt/dtb.img"
 cp "$GITHUB_WORKSPACE/recovery.fstab" "$D/recovery/root/system/etc/recovery.fstab"
 cp "$GITHUB_WORKSPACE/fstab.mt6989" "$D/recovery/root/first_stage_ramdisk/fstab.mt6989"
@@ -46,7 +44,7 @@ export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
 lunch twrp_PD2430-ap2a-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
-mka vendorbootimage -j"$(nproc --all)"
+mka vendorbootimage -j2
 
 echo "== 回传产物到仓库"
 ls -l out/target/product/PD2430/ || true
