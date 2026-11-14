@@ -26,18 +26,16 @@ cd "$HOME/twrp"
 repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14
 repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
-# manifest 里有 prebuilts/misc 但缺 guava 模块：从 AOSP 补 guava 子树
-ls -ld prebuilts/misc prebuilts/misc/.git 2>&1 | head -3
-if [ -d prebuilts/misc/.git ]; then
-  git -C prebuilts/misc fetch --depth=1 -q https://android.googlesource.com/platform/prebuilts/misc \
-    refs/tags/android-14.0.0_r1 2>&1 | tail -1 || true
-  git -C prebuilts/misc checkout -q FETCH_HEAD -- common/guava 2>&1 | tail -1 || true
+# minimal manifest 删了 external/guava（AOSP14 的 guava 模块所在，r67 与 manifest 同版）
+if [ -d external/guava/.git ]; then
+  git -C external/guava fetch --depth=1 -q https://android.googlesource.com/platform/external/guava \
+    refs/tags/android-14.0.0_r67 2>&1 | tail -1 || true
+  git -C external/guava checkout -q FETCH_HEAD -- . 2>&1 | tail -1 || true
 else
-  rm -rf prebuilts/misc
-  git clone --depth=1 -q https://android.googlesource.com/platform/prebuilts/misc prebuilts/misc \
-    -b android-14.0.0_r1 2>&1 | tail -1 || true
+  git clone --depth=1 -q https://android.googlesource.com/platform/external/guava external/guava \
+    -b android-14.0.0_r67 2>&1 | tail -1 || true
 fi
-ls prebuilts/misc/common/guava/ 2>/dev/null && echo "guava OK" || echo "guava 仍缺"
+ls external/guava/Android.bp >/dev/null 2>&1 && echo "guava OK" || echo "guava 仍缺"
 df -h /
 
 echo "== 加 12G swap（kati 解析 14.0 全量配置内存会爆，VM 被收割）"
