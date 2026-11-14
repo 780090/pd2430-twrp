@@ -55,6 +55,11 @@ export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
 lunch twrp_PD2430-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
+# twrp-12.1 只编 vendorboot 时不会生成 $(PRODUCT_OUT)/root，打包 recovery ramdisk 会失败。
+# 先编 bootimage 把 root 填起来（产物用不上），再兜底建目录。
+make bootimage -j2 || true
+mkdir -p out/target/product/PD2430/root
+ls -ld out/target/product/PD2430/root
 make vendorbootimage -j2
 
 echo "== 回传产物到仓库"
