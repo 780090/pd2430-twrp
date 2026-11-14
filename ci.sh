@@ -35,11 +35,15 @@ mkdir -p "$D/prebuilt" "$D/recovery/root/system/etc" "$D/recovery/root/first_sta
 cp "$GITHUB_WORKSPACE/BoardConfig.mk" "$GITHUB_WORKSPACE/device.mk" \
    "$GITHUB_WORKSPACE/AndroidProducts.mk" "$GITHUB_WORKSPACE/twrp_PD2430.mk" \
    "$GITHUB_WORKSPACE/system.prop" "$D/"
+gunzip -c "$GITHUB_WORKSPACE/Image.gz" > "$D/prebuilt/Image"
+ls -l "$D/prebuilt/Image"
 cp "$GITHUB_WORKSPACE/dtb.img" "$D/prebuilt/dtb.img"
 cp "$GITHUB_WORKSPACE/recovery.fstab" "$D/recovery/root/system/etc/recovery.fstab"
 cp "$GITHUB_WORKSPACE/fstab.mt6989" "$D/recovery/root/first_stage_ramdisk/fstab.mt6989"
 # stock vendor_boot 里的内核模块 + init.recovery.mt6989.rc（显示/触摸/UFS 全靠它们）
 tar xzf "$GITHUB_WORKSPACE/vendor-rec.tar.gz" -C "$D/recovery/root"
+cp "$GITHUB_WORKSPACE/loadmods.sh" "$D/recovery/root/system/bin/loadmods.sh"
+chmod 0755 "$D/recovery/root/system/bin/loadmods.sh"
 cp "$GITHUB_WORKSPACE/init.recovery.mt6989.rc" "$D/recovery/root/"
 ls "$D/recovery/root/lib/modules" | wc -l
 find "$D" -type f | sort
