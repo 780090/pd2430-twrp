@@ -1,10 +1,22 @@
-# PD2430 (vivo S20 Pro / mt6989) recovery init —— 从 stock vendor_boot 提取生成
-
-on early-init
-    mkdir /mnt/vendor/persist 0771 system system
-    mkdir /lib/modules 0755 root root
+# PD2430 (vivo S20 Pro / mt6989) recovery init
+# USB / vold 部分参考真机 mt6989 树（realme RE6022L1）
 
 on init
+    setprop sys.usb.configfs 1
+    setprop sys.usb.controller "11201000.usb0"
+    setprop sys.usb.ffs.aio_compat 1
     exec - root root -- /system/bin/sh /system/bin/loadmods.sh
+
+on fs
+    install_keyring
+
+on early-fs
+    start vold
+
+on late-fs
+    mount_all /first_stage_ramdisk/fstab.mt6989 --late
+
+on boot
+    start health-hal-2-1
 
 import /init.recovery.touch.rc
