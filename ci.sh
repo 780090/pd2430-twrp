@@ -6,6 +6,10 @@ echo "== 腾磁盘"
 sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}" || true
 df -h /
 
+echo "== 加 swap（防空 OOM）"
+sudo fallocate -l 8G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=8192
+sudo chmod 600 /swapfile && sudo mkswap /swapfile >/dev/null && sudo swapon /swapfile && free -h
+
 echo "== 装依赖"
 sudo apt-get update -qq
 # 22.04 上没有 libncurses5/lib32ncurses5-dev，用 lib32ncurses-dev 代替
@@ -21,7 +25,7 @@ export PATH="$HOME/bin:$PATH"
 git config --global user.name  "ci-bot"
 git config --global user.email "ci-bot@users.noreply.github.com"
 cd "$HOME/twrp"
-repo init --depth=1 -u https://github.com/nebrassy/platform_manifest_twrp_aosp.git -b twrp-14
+repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
 repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
 df -h /
@@ -35,6 +39,10 @@ cp "$GITHUB_WORKSPACE/BoardConfig.mk" "$GITHUB_WORKSPACE/device.mk" \
 cp "$GITHUB_WORKSPACE/dtb.img" "$D/prebuilt/dtb.img"
 cp "$GITHUB_WORKSPACE/recovery.fstab" "$D/recovery/root/system/etc/recovery.fstab"
 cp "$GITHUB_WORKSPACE/fstab.mt6989" "$D/recovery/root/first_stage_ramdisk/fstab.mt6989"
+# stock vendor_boot 里的内核模块 + init.recovery.mt6989.rc（显示/触摸/UFS 全靠它们）
+tar xzf "$GITHUB_WORKSPACE/vendor-rec.tar.gz" -C "$D/recovery/root"
+cp "$GITHUB_WORKSPACE/init.recovery.mt6989.rc" "$D/recovery/root/"
+ls "$D/recovery/root/lib/modules" | wc -l
 find "$D" -type f | sort
 
 echo "== 编译"
@@ -43,8 +51,8 @@ set +u
 export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 source build/envsetup.sh
-lunch twrp_PD2430-ap2a-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
-mka vendorbootimage -j2
+lunch twrp_PD2430-eng || { echo "--- 可用 lunch 组合 ---"; lunch 2>&1 | tail -40; exit 1; }
+make vendorbootimage -j2
 
 echo "== 回传产物到仓库"
 ls -l out/target/product/PD2430/ || true
