@@ -1,4 +1,4 @@
-# vivo S20 Pro (PD2430 / mt6989) —— 配方照搬 PD2309(X100) 的可用树
+# vivo S20 Pro (PD2430 / mt6989) —— TWRP 14.0 树，结构照搬 X100(PD2309) 可用树
 DEVICE_PATH := device/vivo/PD2430
 
 ALLOW_MISSING_DEPENDENCIES := true
@@ -6,11 +6,13 @@ BUILD_BROKEN_DUP_RULES := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 BUILD_BROKEN_PLUGIN_VALIDATION := soong-libaosprecovery_defaults soong-libguitwrp_defaults soong-libminuitwrp_defaults soong-vold_defaults
 
-# A/B + vendor_boot
+# A/B + vendor_boot（X100 同款三开关）
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     system vendor product odm odm_dlkm system_dlkm vendor_dlkm \
     boot vbmeta_vendor lk vendor_boot
+BOARD_USES_VENDOR_BOOT := true
+BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 TARGET_NO_RECOVERY := true
 
@@ -29,25 +31,24 @@ TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a55
 # 板级
 TARGET_BOOTLOADER_BOARD_NAME := k6989v1_64
 TARGET_NO_BOOTLOADER := true
+TARGET_USES_UEFI := true
 BOARD_USES_MTK_HARDWARE := true
 TARGET_BOARD_PLATFORM := mt6989
 
-# 屏幕
+# 屏幕（X100 同分辨率）
 TARGET_SCREEN_DENSITY := 560
 TARGET_SCREEN_WIDTH := 1260
 TARGET_SCREEN_HEIGHT := 2800
 
-# 版本号占位（避免和固件版本比较冲突）
+# 版本号占位
 PLATFORM_SECURITY_PATCH := 2099-12-31
 PLATFORM_VERSION := 99.87.36
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 
-# 内核：stock prebuilt（GKI 通用内核镜像）
+# 内核：stock prebuilt + vendor_boot 的 dtb 段（DTBO 组合镜像 magic d7b7ab1e）
 TARGET_FORCE_PREBUILT_KERNEL := true
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/Image
-# dtb.img = stock vendor_boot 的 dtb 段（DTBO 组合镜像 magic d7b7ab1e，451179 B）
-# 注意不是 boot 里那个 DTB（d00dfeed），LK 引导 recovery 读的是 vendor_boot 的这段
 TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
 BOARD_KERNEL_IMAGE_NAME := Image
 BOARD_BOOT_HEADER_VERSION := 4
@@ -86,16 +87,13 @@ BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 
-# 分区（数值来自本机 /proc/partitions）
+# 分区（数值与真机 /proc/partitions 核对过）
 BOARD_FLASH_BLOCK_SIZE := 262144
 BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 134217728
-# 真机 super /dev/block/sdc97 = 13631488 KiB = 13958643712 B（info.txt 核对）
 BOARD_SUPER_PARTITION_SIZE := 13958643712
 BOARD_SUPER_PARTITION_GROUPS := main
 BOARD_MAIN_SIZE := 13957488640
-# 只影响构建 super/system 镜像；rec 运行时读的是 super 里的 liblp 元数据
-# 真机逻辑分区：system system_ext product vendor vendor_dlkm odm odm_dlkm system_dlkm cust vgc
 BOARD_MAIN_LIST := system system_ext vendor product odm
 BOARD_USES_METADATA_PARTITION := true
 BOARD_ROOT_EXTRA_FOLDERS += metadata
@@ -106,8 +104,8 @@ TARGET_COPY_OUT_PRODUCT := product
 TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 TARGET_COPY_OUT_ODM := odm
 
-# AVB（用测试 key 签 vendor_boot，解锁状态下能过）
-BOARD_AVB_ENABLE := false
+# AVB（X100 同款：解锁状态下测试 key 签名即可）
+BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 0
 BOARD_AVB_VBMETA_SYSTEM := system
 BOARD_AVB_VENDOR_BOOT_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
@@ -128,7 +126,7 @@ TW_INCLUDE_RESETPROP := true
 TW_INCLUDE_LIBRESETPROP := true
 TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
-TW_DEVICE_VERSION := PD2430-OS6
+TW_DEVICE_VERSION := PD2430-OS6-14
 TW_HAS_MTP := true
 RECOVERY_SDCARD_ON_DATA := true
 TW_EXCLUDE_TWRPAPP := true
@@ -139,13 +137,19 @@ TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 2047
 TW_STATUS_ICONS_ALIGN := center
+TW_CUSTOM_CLOCK_POS := 610
 TW_SUPPORT_INPUT_AIDL_HAPTICS := true
 TW_NO_FASTBOOT_BOOT := true
 TW_INCLUDE_FASTBOOTD := true
-# 自带 init.recovery.usb.rc（configfs 全套 gadget），排除 TWRP 默认 USB init
+# 自带 init.recovery.usb.rc（configfs 全套 gadget）
 TW_EXCLUDE_DEFAULT_USB_INIT := true
+TW_INCLUDE_NTFS_3G := true
+TW_INCLUDE_FUSE_EXFAT := true
+TW_INCLUDE_FUSE_NTFS := true
 
-# 解密：X100 那棵树是开着的，S20 Pro 先照搬试
-TW_INCLUDE_CRYPTO := false
-TW_INCLUDE_CRYPTO_FBE := false
-TW_INCLUDE_FBE_METADATA_DECRYPT := false
+# 解密（X100 同款 trustonic 方案：keymint@3.0 + wrappedkey）
+TW_INCLUDE_CRYPTO := true
+TW_INCLUDE_CRYPTO_FBE := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
+TW_USE_FSCRYPT_POLICY := 2
+TW_PREPARE_DATA_MEDIA_EARLY := true
