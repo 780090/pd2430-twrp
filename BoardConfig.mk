@@ -90,10 +90,13 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 BOARD_FLASH_BLOCK_SIZE := 262144
 BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 134217728
-BOARD_SUPER_PARTITION_SIZE := 13961643008
+# 真机 super /dev/block/sdc97 = 13631488 KiB = 13958643712 B（info.txt 核对）
+BOARD_SUPER_PARTITION_SIZE := 13958643712
 BOARD_SUPER_PARTITION_GROUPS := main
 BOARD_MAIN_SIZE := 13957488640
-BOARD_MAIN_LIST := system vendor product odm
+# 只影响构建 super/system 镜像；rec 运行时读的是 super 里的 liblp 元数据
+# 真机逻辑分区：system system_ext product vendor vendor_dlkm odm odm_dlkm system_dlkm cust vgc
+BOARD_MAIN_LIST := system system_ext vendor product odm
 BOARD_USES_METADATA_PARTITION := true
 BOARD_ROOT_EXTRA_FOLDERS += metadata
 BOARD_SUPPRESS_SECURE_ERASE := true
