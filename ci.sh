@@ -28,6 +28,11 @@ repo sync -c -j"$(nproc --all)" --force-sync --no-clone-bundle --no-tags
 rm -rf .repo
 df -h /
 
+echo "== 加 12G swap（kati 解析 14.0 全量配置内存会爆，VM 被收割）"
+sudo fallocate -l 12G /home/runner/.swapfile && sudo chmod 600 /home/runner/.swapfile \
+  && sudo mkswap /home/runner/.swapfile && sudo swapon /home/runner/.swapfile
+free -h; sudo swapon --show
+
 echo "== 组装 device tree"
 D="$HOME/twrp/device/vivo/PD2430"
 mkdir -p "$D/prebuilt" \
