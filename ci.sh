@@ -61,6 +61,7 @@ make vendorbootimage -j2
 
 echo "== 检查产物"
 ls -l out/target/product/PD2430/vendor_boot.img
+sha256sum out/target/product/PD2430/vendor_boot.img
 du -sh out/target/product/PD2430/recovery/root out/target/product/PD2430/root out/target/product/PD2430/vendor_ramdisk 2>/dev/null || true
 echo "--- recovery/root/system/bin 前 20 个文件 ---"
 ls out/target/product/PD2430/recovery/root/system/bin/ 2>/dev/null | head -20 || true
@@ -74,4 +75,6 @@ gzip -9 -c "$IMG" > "$GITHUB_WORKSPACE/out/vendor_boot.img.gz"
 cd "$GITHUB_WORKSPACE"
 git add out/
 git commit -m "build: $(date -u +%Y%m%d-%H%M) vendor_boot.img" || true
-git push
+# 构建期间仓库可能被推过新提交，先变基再推，避免非快进被拒
+git pull --rebase origin main || true
+git push || echo "push 失败，产物仍在 Actions Artifacts 里"
