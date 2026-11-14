@@ -1,0 +1,19 @@
+# PD2430 recovery 解密（X100 同款 trustonic 方案）
+# 服务定义：mobicore/gatekeeper/keymint 来自真实 /vendor/etc/init/（init 会解析）
+# 打包进 ramdisk 的 vendor/ 只是兜底副本
+
+service prepdecrypt /system/bin/prepdecrypt.sh
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+
+on fs
+    chmod 0755 /system/bin/prepdecrypt.sh
+    start prepdecrypt
+
+on property:crypto.ready=1
+    start mobicore
+    start vendor.gatekeeper-default
+    start vendor.keymint-trustonic
