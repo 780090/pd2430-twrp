@@ -1,0 +1,55 @@
+# TWRP fstab —— PD2430 (vivo S20 Pro / mt6989 / OriginOS6)
+# 分区名与 dump 的 recovery.fstab 一致
+
+# <mount>       <type>  <path>                                          <flags>
+
+/storage        f2fs    /data/media/0                                   flags=display="Internal Storage";usermrf;fsflags="bind";backup=1;removable;
+/boot           emmc    /dev/block/by-name/boot                         flags=display="Boot";slotselect;flashimg=1;backup=1;
+/init_boot      emmc    /dev/block/by-name/init_boot                    flags=display="Init_boot";slotselect;flashimg=1;backup=1;
+/logo           emmc    /dev/block/by-name/logo                         flags=display="Logo";slotselect;flashimg=1;backup=1;
+/dtbo           emmc    /dev/block/by-name/dtbo                         flags=display="DTBO";flashimg=1;backup=1;
+/vbmeta         emmc    /dev/block/by-name/vbmeta                       flags=display="VBMeta";slotselect;flashimg=1;backup=1;
+/vbmeta_vendor  emmc    /dev/block/by-name/vbmeta_vendor                flags=display="VBMeta_vendor";slotselect;flashimg=1;backup=1;
+/vbmeta_system  emmc    /dev/block/by-name/vbmeta_system                flags=display="VBMeta_system";slotselect;flashimg=1;backup=1;
+/vendor_boot    emmc    /dev/block/by-name/vendor_boot                  flags=display="Vendor_boot";slotselect;flashimg=1;backup=1;
+
+# 底层固件（备份为主）
+/lk             emmc    /dev/block/by-name/lk1                          flags=display="lk";slotselect;backup=1;
+/lk2            emmc    /dev/block/by-name/bootloader2                  flags=display="lk_b";slotselect;backup=1;
+/para           emmc    /dev/block/by-name/para                         flags=backup=1;
+/expdb          emmc    /dev/block/by-name/expdb                        flags=backup=1;
+/seccfg         emmc    /dev/block/by-name/seccfg                       flags=backup=1;
+/tee            emmc    /dev/block/by-name/tee1                         flags=display="tee";slotselect;backup=1;
+/tee2           emmc    /dev/block/by-name/tee2                         flags=display="tee_b";slotselect;backup=1;
+/scp            emmc    /dev/block/by-name/scp1                         flags=display="scp";slotselect;backup=1;
+/sspm           emmc    /dev/block/by-name/sspm1                        flags=display="sspm";slotselect;backup=1;
+/md1img         emmc    /dev/block/by-name/md1img                       flags=display="md1img";slotselect;backup=1;
+/md1dsp         emmc    /dev/block/by-name/md1dsp                      flags=backup=1;
+/gz             emmc    /dev/block/by-name/gz1                          flags=display="gz";slotselect;backup=1;
+/spmfw          emmc    /dev/block/by-name/spmfw                        flags=display="spmfw";slotselect;backup=1;
+/boot_para      emmc    /dev/block/by-name/boot_para                   flags=backup=1;
+/otp            emmc    /dev/block/by-name/otp                          flags=backup=1;
+/efuse          emmc    /dev/block/by-name/efuse                        flags=backup=1;
+
+# IMEI 和校准数据（重要！）
+/nvram          emmc    /dev/block/by-name/nvram                        flags=display="nvram";backup=1;
+/nvcfg          ext4    /dev/block/by-name/nvcfg                        flags=display="nvcfg";backup=1;
+/nvdata         ext4    /dev/block/by-name/nvdata                       flags=display="nvdata";backup=1;
+/protect_f      ext4    /dev/block/by-name/protect1                     flags=display="Protect_f";backup=1;
+/protect_s      ext4    /dev/block/by-name/protect2                     flags=display="Protect_s";backup=1;
+/proinfo        emmc    /dev/block/by-name/proinfo                      flags=display="Proinfo";backup=1;
+/persistent     emmc    /dev/block/by-name/frp                          flags=display="Persistent";backup=1;
+
+# 外接存储
+/external_sd    vfat    /dev/block/mmcblk1p1 /dev/block/mmcblk1          flags=display="MicroSD card";storage;wipeingui;removable;fsflags="utf8"
+/usb-otg        vfat    /dev/block/sda1     /dev/block/sda              flags=display="USB OTG";storage;wipeingui;removable;fsflags="utf8"
+
+# 逻辑分区（super 内）
+/system         erofs   /dev/block/mapper/system                        flags=display="System_image";logical;slotselect
+/system_ext     erofs   /dev/block/mapper/system_ext                    flags=display="System_ext_image";logical;slotselect
+/vendor         erofs   /dev/block/mapper/vendor                        flags=display="Vendor_image";logical;slotselect
+/product        erofs   /dev/block/mapper/product                       flags=display="Product_image";logical;slotselect
+/odm            erofs   /dev/block/mapper/odm                           flags=display="Odm_image";logical;slotselect
+/vendor_dlkm    erofs   /dev/block/mapper/vendor_dlkm                   flags=display="Vendor_dlkm_image";logical;slotselect
+/system_dlkm    erofs   /dev/block/mapper/system_dlkm                   flags=display="System_dlkm_image";logical;slotselect
+/odm_dlkm       erofs   /dev/block/mapper/odm_dlkm                      flags=display="Odm_dlkm_image";logical;slotselect
