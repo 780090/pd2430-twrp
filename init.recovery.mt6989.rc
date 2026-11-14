@@ -5,7 +5,7 @@ on init
     setprop sys.usb.configfs 1
     setprop sys.usb.controller "11201000.usb0"
     setprop sys.usb.ffs.aio_compat 1
-    exec - root root -- /system/bin/sh /system/bin/loadmods.sh
+    exec -- /system/bin/sh /system/bin/loadmods.sh
 
 on fs
     install_keyring
