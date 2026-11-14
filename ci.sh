@@ -31,7 +31,7 @@ df -h /
 
 echo "== 组装 device tree"
 D="$HOME/twrp/device/vivo/PD2430"
-mkdir -p "$D/prebuilt" "$D/recovery/root/system/etc" "$D/recovery/root/first_stage_ramdisk"
+mkdir -p "$D/prebuilt" "$D/recovery/root/system/etc" "$D/recovery/root/system/bin" "$D/recovery/root/first_stage_ramdisk"
 cp "$GITHUB_WORKSPACE/BoardConfig.mk" "$GITHUB_WORKSPACE/device.mk" \
    "$GITHUB_WORKSPACE/AndroidProducts.mk" "$GITHUB_WORKSPACE/twrp_PD2430.mk" \
    "$GITHUB_WORKSPACE/system.prop" "$D/"
