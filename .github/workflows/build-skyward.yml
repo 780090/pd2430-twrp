@@ -30,6 +30,10 @@ jobs:
         run: |
           echo "ANDROID_NDK_HOME=$NDK" >> "$GITHUB_ENV"
           cargo install cargo-ndk --version 4.1.2 --locked
+      - name: Patch backlight for MTK/vivo (no msm_drm)
+        run: |
+          curl -sL https://raw.githubusercontent.com/780090/pd2430-twrp/main/patch_ui.py -o patch_ui.py
+          python3 patch_ui.py
       - name: Build skyward (arm64)
         run: cargo ndk -t arm64-v8a --platform 30 build --locked --release -p skyward
       - name: Build system-init (static)
