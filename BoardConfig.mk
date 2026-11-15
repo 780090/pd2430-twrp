@@ -12,7 +12,9 @@ AB_OTA_PARTITIONS += \
     system vendor product odm odm_dlkm system_dlkm vendor_dlkm \
     boot vbmeta_vendor lk vendor_boot
 BOARD_USES_VENDOR_BOOT := true
-BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
+# 注意：不能设 BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT！
+# 本机 LK 把 vendor_boot 整个 ramdisk 区当一条 lz4 流解压（stock 实测），
+# 设了它会拆成两条独立流 -> 解压失败 -> Orange State 重启循环。
 BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
 TARGET_NO_RECOVERY := true
 
@@ -105,7 +107,7 @@ TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 TARGET_COPY_OUT_ODM := odm
 
 # AVB（X100 同款：解锁状态下测试 key 签名即可）
-BOARD_AVB_ENABLE := true
+BOARD_AVB_ENABLE := false
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 0
 BOARD_AVB_VBMETA_SYSTEM := system
 BOARD_AVB_VENDOR_BOOT_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
